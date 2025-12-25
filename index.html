@@ -956,7 +956,7 @@
                 bgImage = "prewar.jpg"; 
                 break;
 
-            case 'q1-scenario': // The Siren and the Room 
+            case 'q1-scenario': // The Siren and the Room (警報)
                 bgImage = "siren.jpg";
                 break;
 
@@ -968,12 +968,12 @@
                 bgImage = "decree.jpg";
                 break;
 
-            case 'q4-scenario': // The Border Crossing (我還沒放這張)
+            case 'q4-scenario': // The Border Crossing (邊境)
                 bgImage = "border.jpg";
                 break;
 
             // --- Mid-War 區域 ---
-            case 'era-midwar': // The Weight of Conflict 
+            case 'era-midwar': // The Weight of Conflict (這頁是你原本很喜歡的那張)
                 bgImage = "midwar.jpg"; 
                 break;
 
@@ -981,24 +981,24 @@
                 bgImage = "loss.jpg";
                 break;
 
-            case 'q6-scenario': // The Last Signal 
-                bgImage = "signal.jpg"; 
+            case 'q6-scenario': // ★ The Last Signal (這是你剛上傳的紅色通訊兵圖)
+                bgImage = "signal.jpg"; // 請將你的圖片命名為 signal_bg.jpg 或自行修改此處
                 break;
 
             // --- Post-War 區域 ---
-            case 'era-postwar': // The Silence After 
+            case 'era-postwar': // The Silence After (戰後開場)
                 bgImage = "postwar.jpg";
                 break;
 
-            case 'q7-scenario': // The Moment the War Ends (我還沒放這張)
+            case 'q7-scenario': // The Moment the War Ends 
                 bgImage = "end.jpg";
                 break;
                 
-            case 'q8-scenario': // The Ruined City (廢墟城市) (我還沒放這張)
+            case 'q8-scenario': // The Ruined City (廢墟城市)
                 bgImage = "ruins.jpg";
                 break;
 
-            case 'q9-scenario': // Aftermath and Memory (我還沒放這張)
+            case 'q9-scenario': // Aftermath and Memory 
                 bgImage = "aftermath.jpg";
                 break;
         }
@@ -1007,7 +1007,7 @@
         if (bgImage) {
             // 如果有指定圖片：套用圖片 + 黑色遮罩 (0.6) 以利閱讀
             contentBox.style.background = `
-                linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)),
+                linear-gradient(rgba(0, 0, 0, 0.85), rgba(0, 0, 0, 0.85)),
                 url('${bgImage}') no-repeat center center / cover
             `;
         } else {
