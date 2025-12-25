@@ -910,7 +910,7 @@
         </div>
 
     </div> <script>
-    // --- PART 4: 整合後的邏輯腳本 ---
+    // --- PART 4: 整合後的邏輯腳本 (已更新背景圖邏輯) ---
 
     // 1. 鬼火首頁切換邏輯
     function startQuiz() {
@@ -932,28 +932,62 @@
     // 2. 原本測驗邏輯
     let userAnswers = {};
 
+    // ★ 重點修改：這裡控制哪一頁要顯示哪張背景圖 ★
     function applyEraTheme(pageId) {
         const el = document.getElementById(pageId);
         const era = el?.dataset?.era || "neutral";
         const root = document.documentElement;
 
-        // 設定文字顏色變數
+        // 設定文字顏色變數 (保持原本的時代顏色)
         if (era === "pre") root.style.setProperty("--era", "var(--pre)");
         else if (era === "mid") root.style.setProperty("--era", "var(--mid)");
         else if (era === "post") root.style.setProperty("--era", "var(--post)");
         else root.style.setProperty("--era", "var(--gold)");
 
-        // ★ 新增功能：針對 Mid-War 時代換背景圖 + 遮罩 ★
+        // 取得背景容器
         const contentBox = document.getElementById('original-content');
-        
-        if (era === "mid") {
-            // 如果是戰爭中期，換成紅色廢墟圖 + 60%黑色遮罩(確保文字可讀)
+        let bgImage = ""; // 預設沒有圖片
+
+        // ▼ 在這裡設定每一頁對應的圖片檔名 ▼
+        // 你可以把你的圖片檔名填入對應的 case 中
+        switch (pageId) {
+            // --- Pre-War 區域 ---
+            case 'era-prewar': // Pre-War 的開場頁
+                // bgImage = "prewar.jpg"; 
+                break;
+            
+            case 'q4-scenario': // The Border Crossing (邊境)
+                // bgImage = "border.jpg";
+                break;
+
+            // --- Mid-War 區域 ---
+            case 'era-midwar': // The Weight of Conflict (這頁是你原本很喜歡的那張)
+                bgImage = "midwar.jpg"; 
+                break;
+
+            case 'q6-scenario': // ★ The Last Signal (這是你剛上傳的紅色通訊兵圖)
+                bgImage = "signal.jpg"; // 請將你的圖片命名為 signal_bg.jpg 或自行修改此處
+                break;
+
+            // --- Post-War 區域 ---
+            case 'era-postwar': // The Silence After (戰後開場)
+                // bgImage = "postwar.jpg";
+                break;
+                
+            case 'q8-scenario': // The Ruined City (廢墟城市)
+                // bgImage = "ruins.jpg";
+                break;
+        }
+
+        // 執行背景切換邏輯
+        if (bgImage) {
+            // 如果有指定圖片：套用圖片 + 黑色遮罩 (0.6) 以利閱讀
             contentBox.style.background = `
                 linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)),
-                url('midwar_bg.jpg') no-repeat center center / cover
+                url('${bgImage}') no-repeat center center / cover
             `;
         } else {
-            // 如果是其他時代，清除背景圖，讓它變回 CSS 預設的漸層背景
+            // 如果沒指定圖片：清除背景，變回 CSS 預設的深色漸層
             contentBox.style.background = ""; 
         }
     }
@@ -962,6 +996,7 @@
         document.getElementById(currentId).classList.remove('active');
         document.getElementById(currentId).classList.add('hidden');
 
+        // 切換頁面時，呼叫 applyEraTheme 來判斷是否要換背景
         applyEraTheme(nextId);
 
         document.getElementById(nextId).classList.remove('hidden');
