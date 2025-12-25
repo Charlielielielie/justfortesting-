@@ -1,0 +1,1168 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Soul Echoes - Psychological Test</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&display=swap" rel="stylesheet">
+
+<style>
+    /* =========================================
+       PART 1: 全局與鬼火首頁樣式
+       ========================================= */
+    :root {
+        /* 原本網站的變數 */
+        --bg: #121212;
+        --card: #1f1f1f;
+        --panel: #202020;
+        --text: rgba(255,255,255,.92);
+        --muted: rgba(255,255,255,.72);
+        --border: rgba(255,255,255,.14);
+        --shadow: 0 18px 46px rgba(0,0,0,.55);
+        --radius: 14px;
+        --gold: #d4af37;
+
+        /* Era theme colors */
+        --pre: #3b82f6;
+        --mid: #ef4444;
+        --post: #22c55e;
+        --era: var(--gold);
+    }
+
+    * { box-sizing: border-box; }
+
+    body, html {
+        margin: 0;
+        padding: 0;
+        width: 100%;
+        height: 100%;
+        background-color: #050505;
+        color: white;
+        font-family: 'Microsoft JhengHei', "Georgia", serif;
+        overflow: hidden; /* 預設鎖住捲軸，等進入測驗再開 */
+    }
+
+    /* --- 鬼火封面區域 --- */
+    #landing-page {
+        position: fixed;
+        top: 0; left: 0;
+        width: 100%; height: 100%;
+        z-index: 9999;
+        /* 背景 GIF */
+        background: #050505 url('bg.gif') no-repeat center center;
+        background-size: cover;
+    }
+
+    .ring-container {
+        position: absolute;
+        /* ★修改重點 1：回到 50% 絕對置中試試看 */
+        top: 44%; 
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: auto;
+        max-width: 450px;
+        text-align: center;
+        z-index: 10;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .magic-text {
+        font-family: 'Cinzel', serif;
+        color: #e0f7ff;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+        margin: 0;
+        text-shadow: 0 0 10px rgba(80, 200, 232, 0.8), 0 0 20px rgba(0,0,0,0.5);
+        animation: text-flicker 4s infinite alternate;
+    }
+
+    .title-top {
+        font-size: 1.8rem;
+        font-weight: 700;
+        margin-bottom: 15px;
+    }
+
+    .title-bottom {
+        font-size: 1rem;
+        letter-spacing: 4px;
+        margin-top: 15px;
+        opacity: 0.8;
+    }
+
+    .start-btn-img {
+        position: relative;
+        display: block;
+        width: 280px; 
+        height: auto;
+        cursor: pointer;
+        transition: transform 0.3s ease, filter 0.3s;
+        filter: drop-shadow(0 0 10px rgba(80, 200, 232, 0.5));
+        /* ★修改重點 2：加入一點圓角 */
+        border-radius: 12px;
+    }
+
+    .start-btn-img:hover {
+        transform: scale(1.05);
+        filter: drop-shadow(0 0 20px rgba(80, 200, 232, 0.8)) brightness(1.1);
+    }
+
+    @keyframes text-flicker {
+        0%, 100% { opacity: 1; text-shadow: 0 0 10px rgba(80, 200, 232, 0.8); }
+        50% { opacity: 0.9; text-shadow: 0 0 20px rgba(80, 200, 232, 1); }
+    }
+
+    /* =========================================
+       PART 2: 原本網站內容容器
+       ========================================= */
+    #original-content {
+        display: none; /* 一開始隱藏 */
+        position: relative;
+        width: 100%;
+        min-height: 100vh;
+        
+        /* 預設背景 (非戰爭時期的背景) */
+        background:
+            radial-gradient(900px 420px at 18% 8%, rgba(212,175,55,.10), transparent 55%),
+            radial-gradient(900px 420px at 82% 14%, rgba(212,175,55,.06), transparent 55%),
+            var(--bg);
+        color: var(--text);
+        font-family: "Georgia","Times New Roman",serif;
+        line-height: 1.85;
+        
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        overflow-x: hidden;
+        transition: background 0.5s ease; /* 讓背景切換時有淡入淡出效果 */
+    }
+
+    /* =========================================
+       PART 3: 測驗元件樣式
+       ========================================= */
+    .page-container {
+        max-width: 760px;
+        width: min(92vw, 760px);
+        padding: 18px;
+        animation: fadeIn .6s ease;
+    }
+
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(10px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    .hidden { display: none !important; }
+    .active { display: block !important; }
+
+    .content-box {
+        background:
+            radial-gradient(1100px 340px at 18% 0%, color-mix(in srgb, var(--era) 22%, transparent), transparent 60%),
+            linear-gradient(180deg, rgba(255,255,255,.03), transparent 40%),
+            rgba(0,0,0,.18);
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        box-shadow: var(--shadow);
+        padding: 1.75rem;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .btn {
+        display: block;
+        width: fit-content;
+        margin: 1.6rem auto 0;
+        padding: 12px 34px;
+        border-radius: 12px;
+        border: 1px solid color-mix(in srgb, var(--era) 85%, rgba(255,255,255,.2));
+        color: color-mix(in srgb, var(--era) 92%, white 8%);
+        background: transparent;
+        cursor: pointer;
+        font-family: inherit;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+        transition: background 180ms ease, color 180ms ease, box-shadow 180ms ease, transform 180ms ease;
+    }
+    .btn:hover {
+        background: var(--era);
+        color: #0f0f0f;
+        box-shadow: 0 0 18px color-mix(in srgb, var(--era) 35%, transparent);
+        transform: translateY(-1px);
+    }
+    .btn:active { transform: translateY(0); }
+
+    h2.scenario-title {
+        margin: 0 0 1.1rem 0;
+        text-align: center;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+        font-size: clamp(1.2rem, 2.2vw, 1.65rem);
+        padding-bottom: .9rem;
+        border-bottom: 1px solid var(--border);
+        color: rgba(255,255,255,.96);
+    }
+
+    .scenario-text p {
+        margin: 0 0 1rem 0;
+        color: rgba(255,255,255,.84);
+        max-width: 64ch;
+        margin-left: auto;
+        margin-right: auto;
+        font-size: 1.05rem;
+    }
+
+    .highlight-text {
+        display: block;
+        margin-top: 1.25rem;
+        text-align: center;
+        font-weight: 700;
+        color: color-mix(in srgb, var(--era) 88%, white 12%);
+        letter-spacing: .3px;
+    }
+
+    .meta-row {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding-bottom: 14px;
+        margin-bottom: 14px;
+        border-bottom: 1px solid var(--border);
+    }
+    .badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 6px 10px;
+        border: 1px solid var(--border);
+        border-radius: 999px;
+        color: rgba(255,255,255,.80);
+        font-size: .78rem;
+        letter-spacing: 1px;
+        text-transform: uppercase;
+        white-space: nowrap;
+        background: rgba(0,0,0,.18);
+    }
+    .badge-dot {
+        width: 8px; height: 8px;
+        border-radius: 50%;
+        background: var(--era);
+        box-shadow: 0 0 14px color-mix(in srgb, var(--era) 40%, transparent);
+    }
+    .progress {
+        flex: 1;
+        height: 9px;
+        border-radius: 999px;
+        background: rgba(0,0,0,.22);
+        border: 1px solid var(--border);
+        overflow: hidden;
+    }
+    .progress > span {
+        display: block;
+        height: 100%;
+        background: linear-gradient(90deg, color-mix(in srgb, var(--era) 20%, transparent), color-mix(in srgb, var(--era) 78%, transparent));
+    }
+
+    .question-header {
+        color: rgba(255,255,255,.88);
+        max-width: 64ch;
+        margin: 0 auto 1.1rem auto;
+        font-size: 1.05rem;
+    }
+    .accent { color: color-mix(in srgb, var(--era) 90%, white 10%); font-weight: 800; }
+
+    .options-container {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+        margin-top: .9rem;
+    }
+    .option-card {
+        width: 100%;
+        border-radius: 12px;
+        border: 1px solid var(--border);
+        background: radial-gradient(1200px 320px at 18% 0%, color-mix(in srgb, var(--era) 18%, transparent), transparent 60%), rgba(0,0,0,.18);
+        padding: 1.05rem 1.05rem 1rem;
+        color: rgba(255,255,255,.88);
+        font-family: inherit;
+        cursor: pointer;
+        transition: transform 160ms ease, border-color 160ms ease, box-shadow 160ms ease, background 160ms ease;
+        text-align: left;
+    }
+    .option-card:hover {
+        transform: translateY(-2px);
+        border-color: color-mix(in srgb, var(--era) 65%, rgba(255,255,255,.2));
+        box-shadow: 0 14px 34px rgba(0,0,0,.55);
+    }
+    .option-label {
+        display: block;
+        color: color-mix(in srgb, var(--era) 88%, white 12%);
+        font-weight: 900;
+        letter-spacing: 1.5px;
+        text-transform: uppercase;
+        font-size: .76rem;
+        margin-bottom: .35rem;
+    }
+    .option-card p { margin: 0; line-height: 1.75; color: rgba(255,255,255,.86); }
+
+    .era-hero {
+        border-radius: var(--radius);
+        padding: 1.5rem 1.25rem 1.2rem;
+        border: 1px solid color-mix(in srgb, var(--era) 55%, rgba(255,255,255,.18));
+        background: radial-gradient(1200px 420px at 50% 0%, color-mix(in srgb, var(--era) 22%, transparent), transparent 62%), linear-gradient(180deg, rgba(255,255,255,.04), transparent 55%), rgba(0,0,0,.20);
+        box-shadow: 0 18px 50px rgba(0,0,0,.45);
+        text-align: center;
+        position: relative;
+        overflow: hidden;
+    }
+    .era-tag {
+        display: inline-flex; align-items: center; gap: 10px;
+        padding: 7px 12px; border-radius: 999px;
+        border: 1px solid color-mix(in srgb, var(--era) 55%, rgba(255,255,255,.18));
+        background: rgba(0,0,0,.18);
+        color: rgba(255,255,255,.82);
+        text-transform: uppercase; letter-spacing: 2px; font-size: .78rem;
+        margin-bottom: 12px; position: relative; z-index: 1;
+    }
+    .era-tag .dot {
+        width: 9px; height: 9px; border-radius: 50%;
+        background: var(--era); box-shadow: 0 0 14px color-mix(in srgb, var(--era) 45%, transparent);
+    }
+    .era-title {
+        margin: 0; font-size: clamp(1.75rem, 3.2vw, 2.65rem);
+        letter-spacing: 4px; text-transform: uppercase;
+        color: rgba(255,255,255,.98); position: relative; z-index: 1;
+    }
+    .era-title em {
+        font-style: normal; color: var(--era);
+        text-shadow: 0 0 18px color-mix(in srgb, var(--era) 35%, transparent);
+    }
+    .era-sub {
+        margin: .55rem auto 0; max-width: 62ch;
+        color: rgba(255,255,255,.78); font-style: italic; font-size: 1.02rem;
+        position: relative; z-index: 1;
+    }
+    .era-points {
+        margin: 1rem auto 0; max-width: 64ch; text-align: left;
+        display: grid; gap: 10px; position: relative; z-index: 1;
+    }
+    .era-point {
+        padding: .85rem .95rem; border-radius: 12px;
+        border: 1px solid var(--border); background: rgba(0,0,0,.16);
+    }
+    .era-point h3 {
+        margin: 0 0 .25rem 0; font-size: .85rem; letter-spacing: 1.6px;
+        text-transform: uppercase; color: color-mix(in srgb, var(--era) 86%, white 14%);
+    }
+    .era-point p { margin: 0; color: rgba(255,255,255,.84); font-size: 1.02rem; }
+
+    /* Result page styles */
+    .result-kicker { text-align: center; color: rgba(255,255,255,.78); letter-spacing: 2px; text-transform: uppercase; font-size: .9rem; margin: 0 0 .25rem 0; }
+    .result-title { text-align: center; margin: 0; font-size: clamp(1.55rem, 3vw, 2.15rem); letter-spacing: 1px; color: #fff; }
+    
+    .result-media { margin-top: 1rem; display: grid; grid-template-columns: 1fr; gap: 12px; }
+    .image-frame {
+        width: 100%; aspect-ratio: 16 / 9; border-radius: 14px; overflow: hidden;
+        border: 1px solid rgba(212,175,55,.35);
+        background: radial-gradient(1000px 300px at 20% 0%, rgba(212,175,55,.12), transparent 60%), rgba(0,0,0,.18);
+        display: flex; align-items: center; justify-content: center;
+        color: rgba(255,255,255,.55); font-style: italic;
+    }
+    .image-frame img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .quote-card { border-radius: 14px; border: 1px solid var(--border); background: rgba(0,0,0,.18); padding: 1rem 1rem .95rem; }
+    .quote-label { display: flex; align-items: center; gap: 10px; color: rgba(255,255,255,.70); text-transform: uppercase; letter-spacing: 1.6px; font-size: .72rem; margin-bottom: .5rem; }
+    .quote-label::before { content: ""; width: 8px; height: 8px; border-radius: 50%; background: var(--gold); box-shadow: 0 0 12px rgba(212,175,55,.35); }
+    .quote-text { margin: 0; color: rgba(255,255,255,.88); font-size: 1.02rem; line-height: 1.8; }
+    .quote-source { margin: .55rem 0 0 0; color: rgba(255,255,255,.66); font-size: .92rem; }
+    .result-sections { margin-top: 14px; display: grid; gap: 12px; }
+    .section { border: 1px solid var(--border); border-radius: 14px; background: rgba(0,0,0,.16); padding: 12px 14px 14px; }
+    .section h3 { margin: 0 0 10px 0; text-transform: uppercase; letter-spacing: 2px; font-size: .82rem; color: rgba(255,255,255,.86); }
+    .section h4 { margin: 10px 0 6px 0; color: rgba(212,175,55,.92); text-transform: uppercase; letter-spacing: 1px; font-size: .82rem; }
+    .section p { margin: 0 0 10px 0; color: rgba(255,255,255,.84); max-width: 66ch; }
+    .reading-list { margin: 6px 0 0 0; padding-left: 18px; }
+    .reading-list li { margin: 6px 0; color: rgba(255,255,255,.84); }
+    .result-actions { margin-top: 14px; display: flex; justify-content: center; }
+
+    @media (max-width: 600px) {
+        .page-container { padding: 14px; }
+        .content-box { padding: 1.25rem; }
+        .btn { width: 100%; padding: 14px 16px; }
+        .title-top { font-size: 1.4rem; }
+        .title-bottom { font-size: 0.8rem; letter-spacing: 2px; }
+        .start-btn-img { width: 220px; }
+    }
+</style>
+</head>
+<body>
+
+    <div id="landing-page">
+        <div class="ring-container">
+            <h1 class="magic-text title-top">SOUL ECHOES TO MODERN</h1>
+            
+            <img src="btn.jpg" class="start-btn-img" alt="Start Quiz" onclick="startQuiz()">
+            
+            <h2 class="magic-text title-bottom">UNVEIL YOUR ARCHETYPE</h2>
+        </div>
+    </div>
+
+
+    <div id="original-content">
+        
+        <div id="intro" class="page-container active" data-era="neutral">
+            <div class="content-box">
+                <h2 class="scenario-title">Instructions</h2>
+                <div class="scenario-text">
+                    <p>This journey moves through three eras: pre-war tension, mid-war strain, and post-war reconstruction.</p>
+                    <p>Choose what feels most instinctive, not what sounds impressive.</p>
+                </div>
+                <button class="btn" onclick="nextPage('intro','era-prewar')">Enter the Pre-War Era</button>
+            </div>
+        </div>
+
+        <div id="era-prewar" class="page-container hidden" data-era="pre">
+            <div class="era-hero">
+                <div class="era-tag"><span class="dot"></span>Pre-War</div>
+                <h1 class="era-title">The <em>Crack</em> in the Century</h1>
+                <p class="era-sub">A world of confidence begins to splinter. You feel the change before anyone names it.</p>
+                <div class="era-points">
+                    <div class="era-point">
+                        <h3>Atmosphere</h3>
+                        <p>Stability thins out. Noise rises. The future feels inevitable and unreadable at the same time.</p>
+                    </div>
+                    <div class="era-point">
+                        <h3>Pressure</h3>
+                        <p>You are asked to respond before you are ready, to choose a posture in a world that accelerates.</p>
+                    </div>
+                    <div class="era-point">
+                        <h3>Focus</h3>
+                        <p>Where you place your energy: crowd or solitude, structure or hesitation, commitment or suspension.</p>
+                    </div>
+                </div>
+                <button class="btn" onclick="nextPage('era-prewar','q1-scenario')">Begin</button>
+            </div>
+        </div>
+
+        <div id="q1-scenario" class="page-container hidden" data-era="pre">
+            <div class="content-box">
+                <div class="meta-row">
+                    <div class="badge"><span class="badge-dot"></span>Pre-War</div>
+                    <div class="progress"><span style="width:11%"></span></div>
+                    <div class="badge">Q1 / 9</div>
+                </div>
+                <h2 class="scenario-title">The Siren and the Room</h2>
+                <div class="scenario-text">
+                    <p>Night falls under blackout. A siren cuts through the city with a sound that does not ask permission.</p>
+                    <p>Outside, the street becomes a moving crowd: footsteps, shouted warnings, nervous laughter that fails to hide fear. Doors slam. Someone knocks hard on a neighbor’s wall. Somewhere close, a window shatters.</p>
+                    <p>Inside your small room, a single candle trembles. On the desk lie unfinished letters and a book left open on the same page for weeks. The world demands response. The room offers containment.</p>
+                    <span class="highlight-text">Where does your energy pull you?</span>
+                </div>
+                <button class="btn" onclick="nextPage('q1-scenario','q1-question')">Continue</button>
+            </div>
+        </div>
+
+        <div id="q1-question" class="page-container hidden" data-era="pre">
+            <div class="content-box">
+                <div class="meta-row">
+                    <div class="badge"><span class="badge-dot"></span>Pre-War</div>
+                    <div class="progress"><span style="width:11%"></span></div>
+                    <div class="badge">Q1 / 9</div>
+                </div>
+                <div class="question-header">
+                    The siren is rising. The street is awake.<br/>
+                    <span class="accent">Where do you feel most alive?</span>
+                </div>
+                <div class="options-container">
+                    <button class="option-card" onclick="recordAnswer(1,'A')">
+                        <span class="option-label">Option A</span>
+                        <p>You open the door and step into the noise. You want your voice to meet other voices.</p>
+                    </button>
+                    <button class="option-card" onclick="recordAnswer(1,'B')">
+                        <span class="option-label">Option B</span>
+                        <p>You stay inside and let the room hold you. Silence helps you think clearly.</p>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div id="q2-scenario" class="page-container hidden" data-era="pre">
+            <div class="content-box">
+                <div class="meta-row">
+                    <div class="badge"><span class="badge-dot"></span>Pre-War</div>
+                    <div class="progress"><span style="width:22%"></span></div>
+                    <div class="badge">Q2 / 9</div>
+                </div>
+                <h2 class="scenario-title">The Speech or the Letter</h2>
+                <div class="scenario-text">
+                    <p>The resistance asks you to answer the war, not later, but now. They offer two paths.</p>
+                    <p>Tomorrow you can stand in the square and speak. Faces will watch you. The crowd will react in real time, pushing back, pulling you forward.</p>
+                    <p>Tonight you can stay awake alone and write a letter. It may never be read. Still, it feels necessary in the way a wound needs air.</p>
+                    <span class="highlight-text">Which form of resistance feels sustainable?</span>
+                </div>
+                <button class="btn" onclick="nextPage('q2-scenario','q2-question')">Continue</button>
+            </div>
+        </div>
+
+        <div id="q2-question" class="page-container hidden" data-era="pre">
+            <div class="content-box">
+                <div class="meta-row">
+                    <div class="badge"><span class="badge-dot"></span>Pre-War</div>
+                    <div class="progress"><span style="width:22%"></span></div>
+                    <div class="badge">Q2 / 9</div>
+                </div>
+                <div class="question-header">
+                    A public speech, or a private letter.<br/>
+                    <span class="accent">Which keeps your mind strongest?</span>
+                </div>
+                <div class="options-container">
+                    <button class="option-card" onclick="recordAnswer(2,'A')">
+                        <span class="option-label">Option A</span>
+                        <p>You speak publicly. The crowd sharpens your thinking and gives your words force.</p>
+                    </button>
+                    <button class="option-card" onclick="recordAnswer(2,'B')">
+                        <span class="option-label">Option B</span>
+                        <p>You write the letter. You need silence and time for meaning to form.</p>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div id="q3-scenario" class="page-container hidden" data-era="pre">
+            <div class="content-box">
+                <div class="meta-row">
+                    <div class="badge"><span class="badge-dot"></span>Pre-War</div>
+                    <div class="progress"><span style="width:33%"></span></div>
+                    <div class="badge">Q3 / 9</div>
+                </div>
+                <h2 class="scenario-title">The Written Decree</h2>
+                <div class="scenario-text">
+                    <p>The occupying government issues a decree overnight. Every citizen must sign a loyalty document by sunset.</p>
+                    <p>Those who sign will be left alone. Those who refuse will be relocated. The paper is already stamped with seals. The language is calm, impersonal, absolute.</p>
+                    <p>You are alone with the document. No audience. No debate. Only the weight of a signature and the silence around it.</p>
+                    <span class="highlight-text">What do you do?</span>
+                </div>
+                <button class="btn" onclick="nextPage('q3-scenario','q3-question')">Continue</button>
+            </div>
+        </div>
+
+        <div id="q3-question" class="page-container hidden" data-era="pre">
+            <div class="content-box">
+                <div class="meta-row">
+                    <div class="badge"><span class="badge-dot"></span>Pre-War</div>
+                    <div class="progress"><span style="width:33%"></span></div>
+                    <div class="badge">Q3 / 9</div>
+                </div>
+                <div class="question-header">
+                    The decree waits for your signature.<br/>
+                    <span class="accent">What feels most truthful to you?</span>
+                </div>
+                <div class="options-container">
+                    <button class="option-card" onclick="recordAnswer(3,'A')">
+                        <span class="option-label">Option A</span>
+                        <p>You sign. Survival requires a clear choice you can carry.</p>
+                    </button>
+                    <button class="option-card" onclick="recordAnswer(3,'B')">
+                        <span class="option-label">Option B</span>
+                        <p>You do not sign yet. You keep the moment open until you cannot.</p>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div id="q4-scenario" class="page-container hidden" data-era="pre">
+            <div class="content-box">
+                <div class="meta-row">
+                    <div class="badge"><span class="badge-dot"></span>Pre-War</div>
+                    <div class="progress"><span style="width:44%"></span></div>
+                    <div class="badge">Q4 / 9</div>
+                </div>
+                <h2 class="scenario-title">The Border Crossing</h2>
+                <div class="scenario-text">
+                    <p>War splits the land in two. One side offers safety, but demands total loyalty. The other offers freedom, but no guarantees.</p>
+                    <p>At midnight the border opens briefly. Soldiers watch without expression. Once you cross, you can never return.</p>
+                    <p>The air is cold. Your breath is visible. Behind you is a life you recognize. Ahead is a life you must choose.</p>
+                    <span class="highlight-text">What is your instinct?</span>
+                </div>
+                <button class="btn" onclick="nextPage('q4-scenario','q4-question')">Continue</button>
+            </div>
+        </div>
+
+        <div id="q4-question" class="page-container hidden" data-era="pre">
+            <div class="content-box">
+                <div class="meta-row">
+                    <div class="badge"><span class="badge-dot"></span>Pre-War</div>
+                    <div class="progress"><span style="width:44%"></span></div>
+                    <div class="badge">Q4 / 9</div>
+                </div>
+                <div class="question-header">
+                    The border is open for minutes.<br/>
+                    <span class="accent">What do you do?</span>
+                </div>
+                <div class="options-container">
+                    <button class="option-card" onclick="recordAnswer(4,'A')">
+                        <span class="option-label">Option A</span>
+                        <p>You cross immediately. Commitment gives your identity shape.</p>
+                    </button>
+                    <button class="option-card" onclick="recordAnswer(4,'B')">
+                        <span class="option-label">Option B</span>
+                        <p>You remain at the line. You refuse to trade wholeness for certainty.</p>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div id="era-midwar" class="page-container hidden" data-era="mid">
+            <div class="era-hero">
+                <div class="era-tag"><span class="dot"></span>Mid-War</div>
+                <h1 class="era-title">The <em>Weight</em> of Conflict</h1>
+                <p class="era-sub">Shock becomes routine. Days stretch. The mind becomes the place the war never leaves.</p>
+                <div class="era-points">
+                    <div class="era-point">
+                        <h3>Atmosphere</h3>
+                        <p>Gray endurance. The same dangers repeat until they feel normal, which is its own kind of horror.</p>
+                    </div>
+                    <div class="era-point">
+                        <h3>Pressure</h3>
+                        <p>Loss arrives without reason. Endings appear with consequences. Waiting becomes a weapon.</p>
+                    </div>
+                    <div class="era-point">
+                        <h3>Focus</h3>
+                        <p>How you interpret loss and whether you demand closure when history offers only compromise.</p>
+                    </div>
+                </div>
+                <button class="btn" onclick="nextPage('era-midwar','q5-scenario')">Enter the Conflict</button>
+            </div>
+        </div>
+
+        <div id="q5-scenario" class="page-container hidden" data-era="mid">
+            <div class="content-box">
+                <div class="meta-row">
+                    <div class="badge"><span class="badge-dot"></span>Mid-War</div>
+                    <div class="progress"><span style="width:56%"></span></div>
+                    <div class="badge">Q5 / 9</div>
+                </div>
+                <h2 class="scenario-title">The Meaning of Loss</h2>
+                <div class="scenario-text">
+                    <p>After a decisive battle, your closest companion is killed by a random shell.</p>
+                    <p>There is no plan, no warning, no last words. A second ago he is there. The next second, he is gone.</p>
+                    <p>That night you are asked to think about his death. The question feels like a trap, as if meaning is owed.</p>
+                    <span class="highlight-text">What is your response?</span>
+                </div>
+                <button class="btn" onclick="nextPage('q5-scenario','q5-question')">Continue</button>
+            </div>
+        </div>
+
+        <div id="q5-question" class="page-container hidden" data-era="mid">
+            <div class="content-box">
+                <div class="meta-row">
+                    <div class="badge"><span class="badge-dot"></span>Mid-War</div>
+                    <div class="progress"><span style="width:56%"></span></div>
+                    <div class="badge">Q5 / 9</div>
+                </div>
+                <div class="question-header">
+                    A death with no pattern, no warning.<br/>
+                    <span class="accent">How do you carry it?</span>
+                </div>
+                <div class="options-container">
+                    <button class="option-card" onclick="recordAnswer(5,'A')">
+                        <span class="option-label">Option A</span>
+                        <p>You accept it as chance. Honesty matters more than comfort.</p>
+                    </button>
+                    <button class="option-card" onclick="recordAnswer(5,'B')">
+                        <span class="option-label">Option B</span>
+                        <p>You let grief change the world. You live inside it until everything is re-measured.</p>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div id="q6-scenario" class="page-container hidden" data-era="mid">
+            <div class="content-box">
+                <div class="meta-row">
+                    <div class="badge"><span class="badge-dot"></span>Mid-War</div>
+                    <div class="progress"><span style="width:67%"></span></div>
+                    <div class="badge">Q6 / 9</div>
+                </div>
+                <h2 class="scenario-title">The Last Signal</h2>
+                <div class="scenario-text">
+                    <p>The war has dragged on for years. You are assigned to a radio station on the edge of the city.</p>
+                    <p>At dawn you are supposed to send a single signal that officially ends resistance. Once it is sent, occupation becomes permanent, and history records the moment as the conclusion.</p>
+                    <p>If you do nothing, the fighting continues without direction: no victory, no resolution, only repetition and fear.</p>
+                    <p>The transmitter hums softly. Dawn is approaching.</p>
+                    <span class="highlight-text">What is your instinct?</span>
+                </div>
+                <button class="btn" onclick="nextPage('q6-scenario','q6-question')">Continue</button>
+            </div>
+        </div>
+
+        <div id="q6-question" class="page-container hidden" data-era="mid">
+            <div class="content-box">
+                <div class="meta-row">
+                    <div class="badge"><span class="badge-dot"></span>Mid-War</div>
+                    <div class="progress"><span style="width:67%"></span></div>
+                    <div class="badge">Q6 / 9</div>
+                </div>
+                <div class="question-header">
+                    A signal can end the war, but also end return.<br/>
+                    <span class="accent">What do you do?</span>
+                </div>
+                <div class="options-container">
+                    <button class="option-card" onclick="recordAnswer(6,'A')">
+                        <span class="option-label">Option A</span>
+                        <p>You send the signal. Closure is cleaner than endless struggle.</p>
+                    </button>
+                    <button class="option-card" onclick="recordAnswer(6,'B')">
+                        <span class="option-label">Option B</span>
+                        <p>You do not send it. You refuse a forced ending built on false certainty.</p>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div id="era-postwar" class="page-container hidden" data-era="post">
+            <div class="era-hero">
+                <div class="era-tag"><span class="dot"></span>Post-War</div>
+                <h1 class="era-title">The <em>Silence</em> After</h1>
+                <p class="era-sub">The guns stop. What remains is rebuilding, memory, and the question of what should be carried forward.</p>
+                <div class="era-points">
+                    <div class="era-point">
+                        <h3>Atmosphere</h3>
+                        <p>Relief mixed with disorientation. Peace can feel unreal after long fear.</p>
+                    </div>
+                    <div class="era-point">
+                        <h3>Pressure</h3>
+                        <p>Life returns faster than the mind. The world asks for normal while memory resists.</p>
+                    </div>
+                    <div class="era-point">
+                        <h3>Focus</h3>
+                        <p>How you witness endings, where you recover, and whether remembrance is private or moral duty.</p>
+                    </div>
+                </div>
+                <button class="btn" onclick="nextPage('era-postwar','q7-scenario')">Enter the Aftermath</button>
+            </div>
+        </div>
+
+        <div id="q7-scenario" class="page-container hidden" data-era="post">
+            <div class="content-box">
+                <div class="meta-row">
+                    <div class="badge"><span class="badge-dot"></span>Post-War</div>
+                    <div class="progress"><span style="width:78%"></span></div>
+                    <div class="badge">Q7 / 9</div>
+                </div>
+                <h2 class="scenario-title">The Moment the War Ends</h2>
+                <div class="scenario-text">
+                    <p>The war ends suddenly. One announcement replaces years of fear.</p>
+                    <p>People rush into the streets together. The air changes. The city moves as if released from a clenched fist.</p>
+                    <p>You are there when it happens. You hear it. You see it. You feel the shift in the crowd.</p>
+                    <span class="highlight-text">How do you experience this moment?</span>
+                </div>
+                <button class="btn" onclick="nextPage('q7-scenario','q7-question')">Continue</button>
+            </div>
+        </div>
+
+        <div id="q7-question" class="page-container hidden" data-era="post">
+            <div class="content-box">
+                <div class="meta-row">
+                    <div class="badge"><span class="badge-dot"></span>Post-War</div>
+                    <div class="progress"><span style="width:78%"></span></div>
+                    <div class="badge">Q7 / 9</div>
+                </div>
+                <div class="question-header">
+                    Peace arrives in a single sentence on the radio.<br/>
+                    <span class="accent">How do you hold the moment?</span>
+                </div>
+                <div class="options-container">
+                    <button class="option-card" onclick="recordAnswer(7,'A')">
+                        <span class="option-label">Option A</span>
+                        <p>You observe quietly. Restraint feels more honest than spectacle.</p>
+                    </button>
+                    <button class="option-card" onclick="recordAnswer(7,'B')">
+                        <span class="option-label">Option B</span>
+                        <p>You join the release. Emotion becomes proof that you are still alive.</p>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div id="q8-scenario" class="page-container hidden" data-era="post">
+            <div class="content-box">
+                <div class="meta-row">
+                    <div class="badge"><span class="badge-dot"></span>Post-War</div>
+                    <div class="progress"><span style="width:89%"></span></div>
+                    <div class="badge">Q8 / 9</div>
+                </div>
+                <h2 class="scenario-title">The Ruined City or the Distant Shore</h2>
+                <div class="scenario-text">
+                    <p>The city is fractured: half-destroyed, half-rebuilding. Committees form. Arguments erupt. Movements demand leaders.</p>
+                    <p>At the same time, you hear of a quiet place beyond the ruins: a shore, a cabin, a stretch of land untouched by slogans or crowds.</p>
+                    <p>You are exhausted in a way sleep cannot fix. Recovery is not rest, but environment.</p>
+                    <span class="highlight-text">Where do you go to regain strength?</span>
+                </div>
+                <button class="btn" onclick="nextPage('q8-scenario','q8-question')">Continue</button>
+            </div>
+        </div>
+
+        <div id="q8-question" class="page-container hidden" data-era="post">
+            <div class="content-box">
+                <div class="meta-row">
+                    <div class="badge"><span class="badge-dot"></span>Post-War</div>
+                    <div class="progress"><span style="width:89%"></span></div>
+                    <div class="badge">Q8 / 9</div>
+                </div>
+                <div class="question-header">
+                    Rebuilding calls for you. Silence also calls for you.<br/>
+                    <span class="accent">Where do you recover best?</span>
+                </div>
+                <div class="options-container">
+                    <button class="option-card" onclick="recordAnswer(8,'A')">
+                        <span class="option-label">Option A</span>
+                        <p>You stay in the city. Planning and proximity give you energy and direction.</p>
+                    </button>
+                    <button class="option-card" onclick="recordAnswer(8,'B')">
+                        <span class="option-label">Option B</span>
+                        <p>You leave for the shore. Distance restores you, and quiet returns you to yourself.</p>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div id="q9-scenario" class="page-container hidden" data-era="post">
+            <div class="content-box">
+                <div class="meta-row">
+                    <div class="badge"><span class="badge-dot"></span>Post-War</div>
+                    <div class="progress"><span style="width:100%"></span></div>
+                    <div class="badge">Q9 / 9</div>
+                </div>
+                <h2 class="scenario-title">Aftermath and Memory</h2>
+                <div class="scenario-text">
+                    <p>Months later, daily life returns. Buildings are repaired and streets fill again.</p>
+                    <p>Someone asks casually whether the war should now be left behind, as if healing is the same as forgetting.</p>
+                    <p>The question is simple. Your answer is not.</p>
+                    <span class="highlight-text">What do you think?</span>
+                </div>
+                <button class="btn" onclick="nextPage('q9-scenario','q9-question')">Continue</button>
+            </div>
+        </div>
+
+        <div id="q9-question" class="page-container hidden" data-era="post">
+            <div class="content-box">
+                <div class="meta-row">
+                    <div class="badge"><span class="badge-dot"></span>Post-War</div>
+                    <div class="progress"><span style="width:100%"></span></div>
+                    <div class="badge">Q9 / 9</div>
+                </div>
+                <div class="question-header">
+                    You are asked whether the war should be left behind.<br/>
+                    <span class="accent">What feels right to you?</span>
+                </div>
+                <div class="options-container">
+                    <button class="option-card" onclick="recordAnswer(9,'A')">
+                        <span class="option-label">Option A</span>
+                        <p>Life keeps moving. Survival means accepting that time does not pause for grief.</p>
+                    </button>
+                    <button class="option-card" onclick="recordAnswer(9,'B')">
+                        <span class="option-label">Option B</span>
+                        <p>Grief should not be rushed. Remembrance is a responsibility, not a delay.</p>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div id="result" class="page-container hidden" data-era="neutral">
+            <div class="content-box" style="--era: var(--gold);">
+                <p class="result-kicker">Your Result</p>
+                <h1 id="result-job" class="result-title">Calculating</h1>
+                
+
+                <div class="result-media">
+                  <div class="image-frame" id="result-img-frame">
+    <img id="result-img" src="" alt="Result image" style="width: 100%; height: 100%; object-fit: cover; display: none;" />
+                </div>
+                    <div class="quote-card">
+                        <div class="quote-label">Classic Line</div>
+                        <p id="result-quote" class="quote-text"></p>
+                        <p id="result-quote-source" class="quote-source"></p>
+                    </div>
+                </div>
+
+                <div class="result-sections">
+                    <div class="section">
+                        <h3>Your Profile</h3>
+                        <h4>How You Face the World</h4>
+                        <p id="result-s1"></p>
+                        <h4>What You Value</h4>
+                        <p id="result-s2"></p>
+                        <h4>Your Inner Risk</h4>
+                        <p id="result-s3"></p>
+                    </div>
+                    <div class="section">
+                        <h3>Recommended Reading</h3>
+                        <p style="margin-top:0;">Start with one text. Read it slowly. Let the style teach you how to think.</p>
+                        <ul id="result-reading" class="reading-list"></ul>
+                    </div>
+                </div>
+
+                <div class="result-actions">
+                    <button class="btn" onclick="restartToHome()">Restart Journey</button>
+                </div>
+            </div>
+        </div>
+
+    </div> <script>
+    // --- PART 4: 整合後的邏輯腳本 ---
+
+    // 1. 鬼火首頁切換邏輯
+    function startQuiz() {
+        const landing = document.getElementById('landing-page');
+        const content = document.getElementById('original-content');
+        
+        // 播放淡出動畫
+        landing.style.transition = 'opacity 0.8s ease';
+        landing.style.opacity = '0';
+        landing.style.pointerEvents = 'none';
+
+        setTimeout(() => {
+            landing.style.display = 'none';
+            content.style.display = 'flex'; // 顯示原本內容
+            document.body.style.overflow = 'auto'; // 開啟捲軸
+        }, 800);
+    }
+
+    // 2. 原本測驗邏輯
+    let userAnswers = {};
+
+    function applyEraTheme(pageId) {
+        const el = document.getElementById(pageId);
+        const era = el?.dataset?.era || "neutral";
+        const root = document.documentElement;
+
+        // 設定文字顏色變數
+        if (era === "pre") root.style.setProperty("--era", "var(--pre)");
+        else if (era === "mid") root.style.setProperty("--era", "var(--mid)");
+        else if (era === "post") root.style.setProperty("--era", "var(--post)");
+        else root.style.setProperty("--era", "var(--gold)");
+
+        // ★ 新增功能：針對 Mid-War 時代換背景圖 + 遮罩 ★
+        const contentBox = document.getElementById('original-content');
+        
+        if (era === "mid") {
+            // 如果是戰爭中期，換成紅色廢墟圖 + 60%黑色遮罩(確保文字可讀)
+            contentBox.style.background = `
+                linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)),
+                url('midwar_bg.jpg') no-repeat center center / cover
+            `;
+        } else {
+            // 如果是其他時代，清除背景圖，讓它變回 CSS 預設的漸層背景
+            contentBox.style.background = ""; 
+        }
+    }
+
+    function nextPage(currentId, nextId) {
+        document.getElementById(currentId).classList.remove('active');
+        document.getElementById(currentId).classList.add('hidden');
+
+        applyEraTheme(nextId);
+
+        document.getElementById(nextId).classList.remove('hidden');
+        document.getElementById(nextId).classList.add('active');
+        window.scrollTo(0, 0);
+    }
+
+    // recordAnswer 保持不變
+    function recordAnswer(qNum, choice) {
+        userAnswers['q' + qNum] = choice;
+
+        if (qNum === 1) nextPage('q1-question', 'q2-scenario');
+        else if (qNum === 2) nextPage('q2-question', 'q3-scenario');
+        else if (qNum === 3) nextPage('q3-question', 'q4-scenario');
+        else if (qNum === 4) nextPage('q4-question', 'era-midwar');
+        else if (qNum === 5) nextPage('q5-question', 'q6-scenario');
+        else if (qNum === 6) nextPage('q6-question', 'era-postwar');
+        else if (qNum === 7) nextPage('q7-question', 'q8-scenario');
+        else if (qNum === 8) nextPage('q8-question', 'q9-scenario');
+        else if (qNum === 9) {
+            calculateFinalResult();
+            nextPage('q9-question', 'result');
+        }
+    }
+
+    // 結果資料 (Results Data)
+    const resultsData = {
+        "ENTJ": {
+            job: "The Rising Politician",
+            image: "politician.jpg",
+            mbti: "MBTI: ENTJ",
+            quote: "Things fall apart; the centre cannot hold.",
+            quoteSource: "W. B. Yeats, The Second Coming",
+            s1: "When structures fail, you move toward authority rather than away from it. You believe disorder demands intervention, not contemplation.",
+            s2: "You value clarity over purity. Stability matters more than moral perfection, and you accept that leadership often costs something.",
+            s3: "Certainty can harden into dominance. Growth comes from remembering that systems exist to serve people, not the reverse.",
+            reading: ["T. S. Eliot — Murder in the Cathedral", "W. B. Yeats — The Second Coming"]
+        },
+        "INTP": {
+            job: "The Void Philosopher",
+            image: "philosopher.jpg",
+            mbti: "MBTI: INTP",
+            quote: "Crass Casualty obstructs the sun and rain.",
+            quoteSource: "Thomas Hardy, Hap",
+            s1: "You do not rush to explain suffering. When loss appears without cause, you accept its randomness rather than forcing meaning onto it.",
+            s2: "You value intellectual honesty. You trust observation over belief and clarity over hope, and you can tolerate uncertainty longer than most.",
+            s3: "Distance can become isolation. When meaninglessness hardens into detachment, you risk forgetting that human connection is also a form of truth.",
+            reading: ["Thomas Hardy — Hap", "Samuel Beckett — Waiting for Godot"]
+        },
+        "ISFP": {
+            job: "The Hesitant Artist",
+            image: "artist.jpg",
+            mbti: "MBTI: ISFP",
+            quote: "Passive, like a helpless animal.",
+            quoteSource: "James Joyce, Eveline",
+            s1: "You feel the weight of decisions deeply. Every action seems to close a door, and you sense what is lost before you see what is gained.",
+            s2: "You value emotional precision. You would rather remain still than act falsely, and silence feels safer than irreversible commitment.",
+            s3: "Waiting can turn into paralysis. Courage for you means accepting imperfect movement and choosing anyway.",
+            reading: ["James Joyce — Eveline", "Samuel Beckett — Waiting for Godot"]
+        },
+        "ISTJ": {
+            job: "The Stoic Medic",
+            image: "medic.jpg",
+            mbti: "MBTI: ISTJ",
+            quote: "I will sign and endure.",
+            quoteSource: "Paired with Seamus Heaney, Punishment; T. S. Eliot, Murder in the Cathedral",
+            s1: "You respond to crisis by maintaining function. You treat what is wounded rather than debating why the wound exists.",
+            s2: "You value reliability and continuity. Rules are tools, not symbols, and duty steadies you when ideals collapse.",
+            s3: "Endurance can slip into moral silence. Reflection protects your humanity when order becomes absolute.",
+            reading: ["Seamus Heaney — Punishment", "T. S. Eliot — Murder in the Cathedral"]
+        },
+        "INTJ": {
+            job: "The Doomsday Strategist",
+            image: "doomsday.jpg",
+            mbti: "MBTI: INTJ",
+            quote: "The best lack all conviction, while the worst are full of passionate intensity.",
+            quoteSource: "W. B. Yeats, The Second Coming",
+            s1: "You see patterns before others notice consequences. Collapse feels predictable rather than shocking, and you think in systems.",
+            s2: "You value foresight and design. Distance sharpens judgment, and planning feels like responsibility rather than detachment.",
+            s3: "You may reduce people to variables. Balance comes from remembering human cost, not only structural outcome.",
+            reading: ["W. B. Yeats — The Second Coming", "Thomas Hardy — Hap"]
+        },
+        "ISFJ": {
+            job: "The Ritual Keeper",
+            image: "ritual.jpg",
+            mbti: "MBTI: ISFJ",
+            quote: "He was my North, my South, my East and West.",
+            quoteSource: "W. H. Auden, Funeral Blues",
+            s1: "You slow time when others rush forward. You believe grief must be witnessed, named, and honored.",
+            s2: "You value memory as moral action. Ritual gives shape to pain and protects dignity when language fails.",
+            s3: "You may cling to mourning too tightly. Healing requires remembrance, and also release.",
+            reading: ["W. H. Auden — Funeral Blues", "Seamus Heaney — Punishment"]
+        },
+        "INFP": {
+            job: "The Idealist Hermit",
+            image: "hermit.jpg",
+            mbti: "MBTI: INFP",
+            quote: "I will arise and go now, and go to Innisfree.",
+            quoteSource: "W. B. Yeats, The Lake Isle of Innisfree",
+            s1: "You withdraw when the world becomes too loud. Distance restores your clarity, and solitude feels like oxygen.",
+            s2: "You value inner coherence. Quiet protects what matters most to you when systems and noise threaten to dilute it.",
+            s3: "Retreat can become escape. Integrity includes return, not only withdrawal.",
+            reading: ["W. B. Yeats — The Lake Isle of Innisfree", "James Joyce — Eveline"]
+        },
+        "ENTP": {
+            job: "The War Journalist",
+            image: "journalist.jpg",
+            mbti: "MBTI: ENTP",
+            quote: "I will wait.",
+            quoteSource: "Paired with Samuel Beckett, Waiting for Godot",
+            s1: "You resist final narratives. When others demand closure, you stay with uncertainty and treat confusion as evidence.",
+            s2: "You value complexity and contradiction. Truth, for you, lives in tension rather than resolution.",
+            s3: "Endless questioning can delay commitment. Knowing when to choose is part of your discipline.",
+            reading: ["Samuel Beckett — Waiting for Godot", "Derek Walcott — A Far Cry from Africa"]
+        },
+        "ESTP": {
+            job: "The Frontline Soldier",
+            image: "soldier.jpg",
+            mbti: "MBTI: ESTP",
+            quote: "A life divided is no life at all.",
+            quoteSource: "Paired with A. E. Housman, To an Athlete Dying Young; T. S. Eliot, Murder in the Cathedral",
+            s1: "You choose quickly and move forward. In crisis, action feels safer than reflection, and commitment gives clarity.",
+            s2: "You value decisiveness and presence. Survival happens now, and you trust momentum when time is thin.",
+            s3: "Speed can erase nuance. Strength grows with restraint and with learning from consequences.",
+            reading: ["A. E. Housman — To an Athlete Dying Young", "T. S. Eliot — Murder in the Cathedral"]
+        }
+    };
+
+    function calculateFinalResult() {
+        let e = 0, i = 0, t = 0, f = 0, j = 0, p = 0;
+
+        if (userAnswers.q1 === 'A') e++; else i++;
+        if (userAnswers.q2 === 'A') e++; else i++;
+        if (userAnswers.q3 === 'A') j++; else p++;
+        if (userAnswers.q4 === 'A') e++; else i++;
+        if (userAnswers.q5 === 'A') t++; else f++;
+        if (userAnswers.q6 === 'A') j++; else p++;
+        if (userAnswers.q7 === 'A') i++; else e++;
+        if (userAnswers.q8 === 'A') e++; else i++;
+        if (userAnswers.q9 === 'A') t++; else f++;
+
+        let key = "INTP";
+
+        if (e > i) {
+            if (j > p) key = "ENTJ";
+            else key = (t >= f) ? "ENTP" : "ESTP";
+        } else {
+            if (f > t) {
+                if (j > p) key = "ISFJ";
+                else key = (userAnswers.q5 === 'B') ? "INFP" : "ISFP";
+            } else {
+                if (j > p) key = (userAnswers.q3 === 'A') ? "ISTJ" : "INTJ";
+                else key = "INTP";
+            }
+        }
+
+        renderResult(key);
+    }
+
+    function renderResult(key) {
+    const data = resultsData[key];
+    document.getElementById('result-job').textContent = data.job;
+    document.getElementById('result-quote').textContent = data.quote;
+    document.getElementById('result-quote-source').textContent = data.quoteSource;
+    document.getElementById('result-s1').textContent = data.s1;
+    document.getElementById('result-s2').textContent = data.s2;
+    document.getElementById('result-s3').textContent = data.s3;
+
+    // 處理閱讀清單
+    const ul = document.getElementById('result-reading');
+    ul.innerHTML = "";
+    data.reading.forEach(item => {
+        const li = document.createElement('li');
+        li.textContent = item;
+        ul.appendChild(li);
+    });
+
+    // --- 圖片處理邏輯 ---
+    const img = document.getElementById('result-img');
+    if (data.image) {
+        img.src = data.image;      // 載入該類別對應的圖片
+        img.style.display = 'block'; // 顯示圖片
+    } else {
+        img.style.display = 'none';  // 若沒設定圖片則隱藏
+    }
+}
+    function restartToHome() {
+        // 直接重新載入頁面，這樣就會從最外層的鬼火首頁重新開始
+        window.location.reload();
+    }
+
+    // 初始化主題
+    (function initTheme() {
+        const active = document.querySelector('.page-container.active');
+        if (active?.id) applyEraTheme(active.id);
+    })();
+</script>
+
+</body>
+
+</html>
+
+
+
